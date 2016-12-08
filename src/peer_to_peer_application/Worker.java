@@ -1,12 +1,10 @@
-package cecs327_assignment5;
+package peer_to_peer_application;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Worker extends Thread{
 	
 	private TokenManager manager;
-	
-//	private boolean haveToken;
 	
 	private AtomicBoolean haveToken;
 	
@@ -18,7 +16,6 @@ public class Worker extends Thread{
 	 */
 	public Worker(TokenManager m) {
 		this.manager = m;
-//		this.haveToken = false;
 		this.haveToken = new AtomicBoolean(false);
 		this.token = null;
 	}
@@ -40,7 +37,7 @@ public class Worker extends Thread{
 	 * @param t
 	 */
 	public void receiveToken(Token t) {
-		System.out.println("have token");
+//		System.out.println("have token");
 		this.token = t;
 		this.haveToken.compareAndSet(false, true);
 	}
@@ -58,17 +55,14 @@ public class Worker extends Thread{
 			//loop until this worker have accessed to token (given by token manager)
 			while(!haveToken.get());
 			//use token: output counter value and increment value
-//			System.out.printf("Worker %d -> counter %d\n", id, token.getCounter());
 			displayWorkerCounter(id, token.incCounter());
-			//token.incCounter();
 			//return token to manager
-			manager.returnToken(token);
+			manager.workerReturnToken(token);
 			//sleep for 50ms
 			try {
 				//sleep is a static method. only this thread will be put to sleep
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

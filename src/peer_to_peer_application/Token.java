@@ -1,10 +1,11 @@
-package cecs327_assignment5;
+package peer_to_peer_application;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Token {
+public class Token implements Serializable{
 	
-	private AtomicInteger counter;
+	private static AtomicInteger counter;
 	
 	/**
 	 * Constructor
@@ -24,7 +25,7 @@ public class Token {
 	 * This method return the current value of counter
 	 * @return counter record the number of worker that have accessed this token
 	 */
-	public int getCounter() {
-		return counter.get();
-	}
+//	public int getCounter() {
+//		return counter.get();
+//	}
 }

@@ -1,6 +1,8 @@
-package cecs327_assignment5;
+package peer_to_peer_application;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
 	
 	private int type;
 	
@@ -10,6 +12,8 @@ public class Message {
 	
 	/**
 	 * Constructor
+	 * id should b -1 if this is a remote request
+	 * id should be Worker's thread id if this is a local request
 	 */
 	public Message(int type, long id) {
 		if(type == LOCAL_REQUEST || type == REMOTE_REQUEST) {
