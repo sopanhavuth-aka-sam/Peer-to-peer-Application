@@ -63,13 +63,16 @@ public class NetworkMonitor extends Thread{
 			try {
 				//read object that was sent
 				Object obj = serverRead.readObject();
+				
 				//if obj is message
 				if(obj instanceof Message) {
+					System.out.println("message received");
 					//add message to TokenManager's queue
 					manager.addRequest((Message) obj);
 				}
 				//if obj is token
 				else if(obj instanceof Token) {
+					System.out.println("token received");
 					//give token to TokenManager
 					manager.tokenManagerReturnToken((Token) obj);
 				}

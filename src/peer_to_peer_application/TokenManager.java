@@ -26,12 +26,17 @@ public class TokenManager extends Thread{
 	private ObjectInputStream clientRead;
 	private ObjectOutputStream clientWrite;
 	
+	//number of remote request message should not go above 1
+	private boolean sentRemoteRequest;
+	
 	/**
 	 * Constructor
 	 */
 	public TokenManager() {
 		this.messageQueue = new ConcurrentLinkedQueue<Message>();
 		this.tokenIsLocal = new AtomicBoolean(false);
+		this.token = null;
+		this.sentRemoteRequest = false;
 	}
 	
 	public void initClientComponent(int portNum) {
@@ -56,12 +61,16 @@ public class TokenManager extends Thread{
 	 */
 	public void sendTokenRequest() {
 		//create remote request message
-		Message m = new Message(1, -1);
+		Message m = new Message(1, "Remote Request");
 		//send Message through socket
 //		clientWrite.print(m);
 		try {
 			clientWrite.writeObject(m);
 			clientWrite.flush();
+			
+			System.out.println("message send");
+			this.sentRemoteRequest = true;
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,6 +87,7 @@ public class TokenManager extends Thread{
 		try {
 			clientWrite.writeObject(this.token);
 			clientWrite.flush();
+			this.token = null;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -106,16 +116,18 @@ public class TokenManager extends Thread{
 	}
 	
 	/**
-	 * This method give token to Worker object using Worker's ThreadID
+	 * This method give token to Worker object using Worker's name
 	 * @param workerID
 	 */
-	public void giveToken(long workerID) {
+	public void giveToken(String workerName) {
 		for(Thread t: Thread.getAllStackTraces().keySet()) {
-			if(t.getId() == workerID) {
+			if(t.getName().equals(workerName)) {
 				if(t instanceof Worker) {
 					//give token to Worker
 					Worker w = (Worker) t;
 					w.receiveToken(this.token);
+					//do we have to set token to null when giving it to worker?
+					this.token = null;
 				}
 			}
 		}
@@ -127,6 +139,7 @@ public class TokenManager extends Thread{
 	 * @param t
 	 */
 	public void workerReturnToken(Token t) {
+		System.out.println("Token return to manager");
 		this.token = t;
 	}
 	
@@ -138,6 +151,7 @@ public class TokenManager extends Thread{
 	public void tokenManagerReturnToken(Token t) {
 		this.token = t;
 		this.tokenIsLocal.compareAndSet(false, true);
+		this.sentRemoteRequest = false;
 	}
 	
 	public void run() {
@@ -152,17 +166,17 @@ public class TokenManager extends Thread{
 			}
 			else {
 				//if this TokenManager doesn't have token -> send request message and wait
-				if(!tokenIsLocal.get()) {
+				if(!tokenIsLocal.get() && !this.sentRemoteRequest) {
 					sendTokenRequest();
 				}
 				//wait for token
-				while(!tokenIsLocal.get());
+				while(!tokenIsLocal.get() || this.token == null);
 				//de-queue message
 				Message m = messageQueue.poll();
 				//if it is local request -> give token to local worker
 				if(m.isLocal()) {
-//					System.out.println("local");
-					giveToken(m.getRequesterId());
+					System.out.println("give token to " + m.getRequesterName());
+					giveToken(m.getRequesterName());
 				}
 				//if it is remote request -> send token to other token manager
 				else if(m.isRemote()) {

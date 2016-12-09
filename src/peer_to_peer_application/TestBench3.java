@@ -19,7 +19,8 @@ public class TestBench3 {
 		
 		//link workers to manager
 		for(int i = 0; i < WORKER_NUM; i++ ) {
-			workers[i] = new Worker(manager);
+			String threadName = "manager2_worker" + i;
+			workers[i] = new Worker(manager, threadName);
 		}	
 		
 		//initialize client networking components in TokenManager
@@ -38,6 +39,7 @@ public class TestBench3 {
 		manager.start();
 		for(int i = 0; i < WORKER_NUM; i++ ) {
 			workers[i].start();
+
 		}
 		
 		//wait for workers to finish their jobs

@@ -17,7 +17,8 @@ public class TestBench {
 		manager.createToken();
 		//link workers to manager
 		for(int i = 0; i < WORKER_NUM; i++ ) {
-			workers[i] = new Worker(manager);
+			String threadName = "manager0_worker" + i;
+			workers[i] = new Worker(manager, threadName);
 		}
 		//start manager and workers thread
 		manager.start();

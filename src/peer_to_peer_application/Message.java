@@ -8,21 +8,21 @@ public class Message implements Serializable {
 	
 	private final int LOCAL_REQUEST = 0, REMOTE_REQUEST = 1;
 	
-	private long requesterId;
+	private String requesterName;
 	
 	/**
 	 * Constructor
 	 * id should b -1 if this is a remote request
 	 * id should be Worker's thread id if this is a local request
 	 */
-	public Message(int type, long id) {
+	public Message(int type, String name) {
 		if(type == LOCAL_REQUEST || type == REMOTE_REQUEST) {
 			this.type = type;
 		}
 		else {
 			System.out.println("Wrong type");
 		}
-		this.requesterId = id;
+		this.requesterName = name;
 	}
 	
 	public boolean isLocal() {
@@ -43,7 +43,7 @@ public class Message implements Serializable {
 		}
 	}
 	
-	public long getRequesterId() {
-		return this.requesterId;
+	public String getRequesterName() {
+		return this.requesterName;
 	}
 }

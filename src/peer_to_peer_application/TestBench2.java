@@ -20,7 +20,8 @@ public class TestBench2 {
 		
 		//link workers to manager
 		for(int i = 0; i < WORKER_NUM; i++ ) {
-			workers[i] = new Worker(manager);
+			String threadName = "manager1_worker" + i;
+			workers[i] = new Worker(manager, threadName);
 		}	
 		
 		//initialize NetworkMonitor
